@@ -1,4 +1,3 @@
-
 #include <stdio.h>     
 #include <string.h>              
 #include <stdlib.h>              
@@ -130,6 +129,7 @@ int main() {
                 }
                 setLeds(0, 0, 1); // LED Azul indica modo de espera
                 drawImage(&ssd, cadeado_fechado); // Mostra ícone de cadeado fechado
+                apagarMatriz(); // Apaga a matriz LED
                 break;
 
             case PRESENCA_DETECTADA:
@@ -137,12 +137,15 @@ int main() {
                 if (distancia > 30) {
                     estadoAtual = ESPERANDO;
                 }
+                desenhoX(); // Desenha um "X" na matriz LED
                 setLeds(1, 0, 0); // LED Vermelho indica alerta
                 drawImage(&ssd, alerta); // Mostra ícone de alerta
                 alarmePresencaPWM(BUZZER1); // Aciona o alarme sonoro
+                apagarMatriz(); // Apaga a matriz LED
                 break;
 
             case PORTAO_ABERTO:
+                desenhoCheck(); // Desenha um "check" na matriz LED
                 setLeds(0, 1, 0);  // LED Verde indica portão aberto
                 drawImage(&ssd, cadeado_aberto);  // Mostra ícone de cadeado aberto
                 break;
