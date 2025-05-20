@@ -102,7 +102,9 @@ int main() {
     somInicializacao(BUZZER2);
     while (true) {
         cyw43_arch_poll();  // Processa eventos do Wi-Fi
+
         distancia = getCmFiltered(TRIGGER, ECHO, 6); // Mede a distância com filtragem para reduzir ruídos
+        if (distancia < 2) distancia = 2; // Valor mínimo seguro para evitar travamento
  
         // Limpa o display para nova renderização
         ssd1306_fill(&ssd, false);
@@ -116,6 +118,7 @@ int main() {
 
         // Toca o som de fechamento da Porta/Portão quando necessário
         if (tocar_som_fechamento) {
+            apagarMatriz(); // Apaga a matriz LED
             tocar_som_fechamento = false;
             somFechamentoPortao(BUZZER2);
         }
@@ -129,7 +132,6 @@ int main() {
                 }
                 setLeds(0, 0, 1); // LED Azul indica modo de espera
                 drawImage(&ssd, cadeado_fechado); // Mostra ícone de cadeado fechado
-                apagarMatriz(); // Apaga a matriz LED
                 break;
 
             case PRESENCA_DETECTADA:

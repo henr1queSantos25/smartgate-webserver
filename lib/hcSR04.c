@@ -22,8 +22,14 @@ uint64_t getPulse(uint trigPin, uint echoPin) {
 
     uint64_t width = 0;
 
-    // Aguarda até que o pino echo fique HIGH
-    while (gpio_get(echoPin) == 0) tight_loop_contents();
+    // Aguarda até que o pino echo fique HIGH (com timeout)
+    uint64_t wait_count = 0;
+    while (gpio_get(echoPin) == 0) {
+        tight_loop_contents();
+        wait_count++;
+        sleep_us(1);
+        if (wait_count > timeout) return 0; // Timeout esperando ECHO HIGH
+    }
     absolute_time_t startTime = get_absolute_time();
     // Mede o tempo até que o pino echo volte para LOW
     while (gpio_get(echoPin) == 1) 
@@ -37,7 +43,6 @@ uint64_t getPulse(uint trigPin, uint echoPin) {
     
     return absolute_time_diff_us(startTime, endTime);
 }
-
 
 // Obtém a distância em centímetros
 uint64_t getCm(uint trigPin, uint echoPin) {
