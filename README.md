@@ -97,6 +97,7 @@ O **SmartGate** é um sistema embarcado de controle de acesso inteligente desenv
 
 - **`smartgate_webserver.c`**: Código-fonte principal do projeto.
 - **`CMakeLists.txt`**: Arquivo de configuração para o sistema de build CMake.
+- **`lwipopts.h`**: Arquivo de configuração personalizada para a stack TCP/IP lwIP, definindo parâmetros de memória, protocolos habilitados e configurações específicas do servidor web.
 - **`lib/hcSR04.h` e `lib/hcSR04.c`**: Biblioteca para o sensor ultrassônico HC-SR04.
 - **`lib/ssd1306.h` e `lib/ssd1306.c`**: Biblioteca para controle do display OLED.
 - **`lib/led_5x5.h` e `lib/led_5x5.c`**: Biblioteca para controle da matriz de LEDs 5x5 via PIO.
