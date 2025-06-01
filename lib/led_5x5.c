@@ -95,5 +95,32 @@ void desenharCorNaMatriz(float r, float g, float b) {
 }
 
 
+void desenhoCheck() {
+    for (int i = 0; i < NUM_PIXELS; i++) {
+        uint32_t valor_led;
+
+        if (i == 3 || i == 5 || i == 7 || i == 11 || i == 19) {
+            valor_led = matrix_rgb(0.0, 0.01, 0.0);
+        } else {
+            valor_led = matrix_rgb(0.0, 0.0, 0.0);
+        }
+
+        pio_sm_put_blocking(pio0, 0, valor_led);
+    }
+}
+
+void desenhoX() {
+    for (int i = 0; i < NUM_PIXELS; i++) {
+        uint32_t valor_led;
+
+        if (i == 6 || i == 8 || i == 12 || i == 16 || i == 18) {
+            valor_led = matrix_rgb(0.2, 0.0, 0.0);
+        } else {
+            valor_led = matrix_rgb(0.0, 0.0, 0.0);
+        }
+
+        pio_sm_put_blocking(pio0, 0, valor_led);
+    }
+}
 
 

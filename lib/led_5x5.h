@@ -13,3 +13,5 @@ void drawMatrix(uint cor);
 void apagarMatriz();
 bool isCentroMatriz(int i);
 void desenharCorNaMatriz(float r, float g, float b);
+void desenhoCheck();
+void desenhoX();

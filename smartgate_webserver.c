@@ -1,4 +1,3 @@
-
 #include <stdio.h>     
 #include <string.h>              
 #include <stdlib.h>              
@@ -103,7 +102,9 @@ int main() {
     somInicializacao(BUZZER2);
     while (true) {
         cyw43_arch_poll();  // Processa eventos do Wi-Fi
+
         distancia = getCmFiltered(TRIGGER, ECHO, 6); // Mede a distância com filtragem para reduzir ruídos
+        if (distancia < 2) distancia = 2; // Valor mínimo seguro para evitar travamento
  
         // Limpa o display para nova renderização
         ssd1306_fill(&ssd, false);
@@ -117,6 +118,7 @@ int main() {
 
         // Toca o som de fechamento da Porta/Portão quando necessário
         if (tocar_som_fechamento) {
+            apagarMatriz(); // Apaga a matriz LED
             tocar_som_fechamento = false;
             somFechamentoPortao(BUZZER2);
         }
@@ -137,12 +139,15 @@ int main() {
                 if (distancia > 30) {
                     estadoAtual = ESPERANDO;
                 }
+                desenhoX(); // Desenha um "X" na matriz LED
                 setLeds(1, 0, 0); // LED Vermelho indica alerta
                 drawImage(&ssd, alerta); // Mostra ícone de alerta
                 alarmePresencaPWM(BUZZER1); // Aciona o alarme sonoro
+                apagarMatriz(); // Apaga a matriz LED
                 break;
 
             case PORTAO_ABERTO:
+                desenhoCheck(); // Desenha um "check" na matriz LED
                 setLeds(0, 1, 0);  // LED Verde indica portão aberto
                 drawImage(&ssd, cadeado_aberto);  // Mostra ícone de cadeado aberto
                 break;
@@ -209,8 +214,8 @@ static err_t tcp_server_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, er
     }
 
     // Buffer estático para armazenar a requisição
-    char request[256];  // Tamanho fixo suficiente para requisições HTTP simples
-    int len = p->len < 255 ? p->len : 255;  // Limita ao tamanho do buffer
+    char request[1024];  // Tamanho fixo suficiente para requisições HTTP simples
+    int len = p->len < 1023 ? p->len : 1023;  // Limita ao tamanho do buffer
     memcpy(request, p->payload, len);
     request[len] = '\0';  // Garante terminação nula
 
@@ -227,18 +232,23 @@ static err_t tcp_server_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, er
         strcpy(status, "Portao aberto – acesso autorizado");
 
     // Cria o corpo da página HTML
-    static char body[700];
+    static char body[750];
     int body_len = snprintf(body, sizeof(body),
         "<!DOCTYPE html>\n"
-        "<meta http-equiv=\"refresh\" content=\"2\">"
+        "<meta http-equiv=\"refresh\" content=\"3\">"
         "<html lang='pt-br'>\n"
         "<head><meta charset='UTF-8'><title>Portão Inteligente</title></head>\n"
-        "<body style='text-align:center; font-family:sans-serif; background:#f2f2f2;'>\n"
+        "<style>\n"
+        "body { background-color: #e3f6fc; font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }\n"
+        "h1 { font-size: 60px; margin-bottom: 28px;}\n"
+        "button { background-color: LightGray; font-size: 32px; margin: 10px; padding: 18px 38px; border-radius: 10px; }\n"
+        "</style>\n"
+        "<body>\n"
         "<h1>Portão Inteligente</h1>\n"
         "<p>Status: <strong>%s</strong></p>\n"
-        "<p>Distância: %.1f cm</p>\n"
-        "<form action='/abrir_portao'><button style='padding:20px; font-size:20px; margin: 15px;'>Abrir Portão</button></form>\n"
-        "<form action='/fechar_portao'><button style='padding:20px; font-size:20px; margin: 15px;'>Fechar Portão</button></form>\n"
+        "<p>Distância: <strong>%.1f cm</strong></p>\n"
+        "<form action='/abrir_portao'><button>Abrir Portão</button></form>\n"
+        "<form action='/fechar_portao'><button>Fechar Portão</button></form>\n"
         "</body>\n"
         "</html>\n",
         status, (float)distancia);
